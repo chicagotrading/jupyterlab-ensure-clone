@@ -24,8 +24,9 @@ class RouteHandler(APIHandler):
         if not all((parsedUrl.scheme, parsedUrl.netloc, parsedUrl.path)):
             raise tornado.web.HTTPError(400, "invalid repoUrl")
         targetDir = data.get("targetDir", parsedUrl.path.rsplit("/", 1)[-1]).removesuffix(".git")
-        if Path(targetDir).expanduser().is_dir():
-            logger.debug("targetDir %r exists, assuming repo already cloned there", targetDir)
+        targetDir = Path(targetDir).expanduser()
+        if targetDir.is_dir():
+            logger.debug("targetDir %s exists, assuming repo already cloned there", targetDir)
             self.set_status(204)
             self.finish()
             return
@@ -33,10 +34,11 @@ class RouteHandler(APIHandler):
         password = data.get("password")
         if username or password:
             repoUrl = f"https://{username}:{password}@{parsedUrl.netloc}{parsedUrl.path}"
+        targetDir = str(targetDir)
         try:
             subprocess.check_call(("git", "clone", repoUrl, targetDir), env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
         except subprocess.CalledProcessError:
-            logging.error("Failed to clone repo, see output above")
+            logger.debug("Failed to clone repo (expected in the pre-dialog check in the needCredentials case), see output above")
             raise tornado.web.HTTPError(400, reason=f"Failed to clone {repoUrl}, maybe due to bad credentials") from None
         logger.debug("cloned repo into %r", targetDir)
         self.set_status(204)
