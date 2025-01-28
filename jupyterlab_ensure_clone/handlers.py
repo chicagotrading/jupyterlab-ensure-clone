@@ -27,6 +27,13 @@ class RouteHandler(APIHandler):
         targetDir = Path(targetDir).expanduser()
         if targetDir.is_dir():
             logger.debug("targetDir %s exists, assuming repo already cloned there", targetDir)
+            updateScript = data.get("updateScript")
+            if updateScript:
+                try:
+                    subprocess.check_call((updateScript,), env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
+                except subprocess.CalledProcessError:
+                    logger.debug("Failed to update (expected in the pre-dialog check in the needCredentials case), see output above")
+                    raise tornado.web.HTTPError(400, reason="Failed to update, maybe due to bad credentials") from None
             self.set_status(204)
             self.finish()
             return
@@ -39,7 +46,7 @@ class RouteHandler(APIHandler):
             subprocess.check_call(("git", "clone", repoUrl, targetDir), env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
         except subprocess.CalledProcessError:
             logger.debug("Failed to clone repo (expected in the pre-dialog check in the needCredentials case), see output above")
-            raise tornado.web.HTTPError(400, reason=f"Failed to clone {repoUrl}, maybe due to bad credentials") from None
+            raise tornado.web.HTTPError(400, reason="Failed to clone, maybe due to bad credentials") from None
         logger.debug("cloned repo into %r", targetDir)
         self.set_status(204)
         self.finish()

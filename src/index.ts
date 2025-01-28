@@ -42,6 +42,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         input = input.value;
         input.repoUrl = input.repoUrl || settings.repoUrl;
         input.targetDir = input.targetDir || settings.targetDir;
+        input.updateScript = input.updateScript || settings.updateScript;
       }
     }
   }
@@ -56,6 +57,9 @@ class LoginForm extends Widget {
   constructor(settings: any) {
     super();
     this.addClass('jp-LoginForm');
+    if (settings.helpText) {
+      this.node.appendChild(document.createElement('p')).textContent = settings.helpText;
+    }
     this.repoUrlInput = this.createInput({ placeholder: 'Repo URL' });
     this.targetDirInput = this.createInput({ placeholder: 'Target directory' });
     this.usernameInput = this.createInput({ placeholder: 'Username' });
