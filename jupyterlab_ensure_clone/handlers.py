@@ -2,6 +2,7 @@ import os
 import logging
 import subprocess
 from pathlib import Path
+from urllib.parse import quote
 from urllib.parse import urlparse
 
 from jupyter_server.base.handlers import APIHandler
@@ -40,6 +41,8 @@ class RouteHandler(APIHandler):
         username = data.get("username")
         password = data.get("password")
         if username or password:
+            username = quote(username, safe='')
+            password = quote(password, safe='')
             repoUrl = f"https://{username}:{password}@{parsedUrl.netloc}{parsedUrl.path}"
         targetDir = str(targetDir)
         try:
