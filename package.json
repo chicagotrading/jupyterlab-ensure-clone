@@ -1,6 +1,6 @@
 {
     "name": "jupyterlab-ensure-clone",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Ensure a git repo has been cloned at startup.",
     "keywords": [
         "jupyter",
