@@ -42,7 +42,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         input = input.value;
         input.repoUrl = input.repoUrl || settings.repoUrl;
         input.targetDir = input.targetDir || settings.targetDir;
-        input.updateScript = input.updateScript || settings.updateScript;
       }
     }
   }
