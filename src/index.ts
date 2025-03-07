@@ -1,13 +1,9 @@
 /* eslint "no-constant-condition": "off" */
 
 import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
-
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-
 import { showDialog } from '@jupyterlab/apputils';
-
 import { Widget } from '@lumino/widgets';
-
 import { requestAPI } from './handler';
 
 const plugin: JupyterFrontEndPlugin<void> = {
@@ -18,34 +14,38 @@ const plugin: JupyterFrontEndPlugin<void> = {
   activate: async (app: JupyterFrontEnd, settingsRegistry: ISettingRegistry) => {
     console.log(`JupyterLab extension ${plugin.id} is activated!`);
     const settings = (await settingsRegistry.load(plugin.id)).composite.private as any;
-    const form = new LoginForm(settings);
-    let input = settings as any;
-    let errCount = 0;
-    while (true) {
-      try {
-        await requestAPI<any>('', { method: 'POST', body: JSON.stringify(input) });
-        break;
-      } catch (err) {
-        errCount++;
-        // If we're missing credentials and the repo requires them, an initial error is expected.
-        const title = errCount < 2 ? settings.title : 'Error ensuring clone, try again?';
-        while (true) {
-          input = await showDialog({ title: title, body: form });
-          if (!input.button.accept) {
-            if (confirm('You may be missing functionality if you cancel. Are you sure?')) {
-              return;
-            }
-            continue;
-          }
-          break;
-        }
-        input = input.value;
-        input.repoUrl = input.repoUrl || settings.repoUrl;
-        input.targetDir = input.targetDir || settings.targetDir;
-      }
-    }
+    window.setTimeout(() => ensureClone(settings), 2000);
   }
 };
+
+async function ensureClone(settings: any) {
+  const form = new LoginForm(settings);
+  let input = settings as any;
+  let errCount = 0;
+  while (true) {
+    try {
+      await requestAPI<any>('', { method: 'POST', body: JSON.stringify(input) });
+      break;
+    } catch (err) {
+      errCount++;
+      // If we're missing credentials and the repo requires them, an initial error is expected.
+      const title = errCount < 2 ? settings.title : 'Error ensuring clone, try again?';
+      while (true) {
+        input = await showDialog({ title: title, body: form });
+        if (!input.button.accept) {
+          if (confirm('You may be missing functionality if you cancel. Are you sure?')) {
+            return;
+          }
+          continue;
+        }
+        break;
+      }
+      input = input.value;
+      input.repoUrl = input.repoUrl || settings.repoUrl;
+      input.targetDir = input.targetDir || settings.targetDir;
+    }
+  }
+}
 
 class LoginForm extends Widget {
   private repoUrlInput: HTMLInputElement;
