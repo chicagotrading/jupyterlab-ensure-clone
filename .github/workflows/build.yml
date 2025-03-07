@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout
@@ -68,13 +68,13 @@ jobs:
 
   test_isolated:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.12'
         architecture: 'x64'
     - uses: actions/download-artifact@v4
       with:
@@ -157,7 +157,7 @@ jobs:
 
   check_links:
     name: Check Links
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
