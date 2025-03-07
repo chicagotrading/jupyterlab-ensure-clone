@@ -49,18 +49,16 @@ class RouteHandler(APIHandler):
                         git("-C", targetDir, "remote", "set-url", "origin", repoUrl)
                         git("-C", targetDir, "fetch", "-q")
                     except subprocess.CalledProcessError:
-                        pass  # fall through to failure with 400 error below
+                        pass  # fall through to failure response below
                     else:
                         logger.info("fetch succeeded, removing credentials from origin URL")
                         git("-C", targetDir, "remote", "set-url", "origin", repoUrlOrig)
                         self.set_status(204)
-                        self.finish()
-                        return
+                        return self.finish()
                 logger.info("fetch failed (expected in the pre-dialog check in the needCredentials case), see output above")
                 raise tornado.web.HTTPError(400, reason="Failed to update, maybe due to bad credentials") from None
             self.set_status(204)
-            self.finish()
-            return
+            return self.finish()
         targetDir = str(targetDir)
         logger.info("cloning into %s...", targetDir)
         try:
@@ -74,7 +72,7 @@ class RouteHandler(APIHandler):
                 logger.info("removing credentials from origin URL")
                 git("-C", targetDir, "remote", "set-url", "origin", repoUrlOrig)
             self.set_status(204)
-            self.finish()
+            return self.finish()
 
 
 def setup_handlers(web_app):
