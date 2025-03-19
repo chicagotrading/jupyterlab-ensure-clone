@@ -41,13 +41,13 @@ class RouteHandler(APIHandler):
             targetDir = str(targetDir)
             logger.info("targetDir %s exists, attempting git fetch...", targetDir)
             try:
-                git("-C", targetDir, "fetch", "-q")
+                git("-C", targetDir, "fetch", "-q", "--prune")
             except subprocess.CalledProcessError:
                 if repoUrlOrig != repoUrl:
                     logger.info("fetch failed, trying again with provided credentials")
                     try:
                         git("-C", targetDir, "remote", "set-url", "origin", repoUrl)
-                        git("-C", targetDir, "fetch", "-q")
+                        git("-C", targetDir, "fetch", "-q", "--prune")
                     except subprocess.CalledProcessError:
                         pass  # fall through to failure response below
                     else:
