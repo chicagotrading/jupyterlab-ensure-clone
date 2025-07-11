@@ -7,9 +7,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/ctcjab/jupyterlab-ensure-clone",
+    "homepage": "https://github.com/chicagotrading/jupyterlab-ensure-clone",
     "bugs": {
-        "url": "https://github.com/ctcjab/jupyterlab-ensure-clone/issues"
+        "url": "https://github.com/chicagotrading/jupyterlab-ensure-clone/issues"
     },
     "license": "BSD-3-Clause",
     "author": {
@@ -27,7 +27,7 @@
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ctcjab/jupyterlab-ensure-clone.git"
+        "url": "https://github.com/chicagotrading/jupyterlab-ensure-clone.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",
