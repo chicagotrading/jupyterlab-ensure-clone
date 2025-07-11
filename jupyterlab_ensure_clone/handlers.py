@@ -14,8 +14,8 @@ logger = logging.getLogger("jupyterlab_ensure_clone")
 logger.setLevel(logging.DEBUG)
 
 
-def git(*args):
-    subprocess.check_call(("git", *args), env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
+def git(*args, **kw):
+    subprocess.check_call(("git", *args), env={**os.environ, "GIT_TERMINAL_PROMPT": "0"}, **kw)
 
 
 class RouteHandler(APIHandler):
@@ -39,24 +39,25 @@ class RouteHandler(APIHandler):
         targetDir = Path(targetDir).expanduser()
         if targetDir.is_dir():
             targetDir = str(targetDir)
-            logger.info("targetDir %s exists, attempting git fetch...", targetDir)
+            logger.info("targetDir %s exists, attempting git ls-remote...", targetDir)
             try:
-                git("-C", targetDir, "fetch", "-q", "--prune")
+                git("-C", targetDir, "ls-remote", "origin", "-q", stdout=subprocess.DEVNULL)
             except subprocess.CalledProcessError:
                 if repoUrlOrig != repoUrl:
-                    logger.info("fetch failed, trying again with provided credentials")
+                    logger.info("ls-remote failed, trying again with provided credentials")
                     try:
                         git("-C", targetDir, "remote", "set-url", "origin", repoUrl)
-                        git("-C", targetDir, "fetch", "-q", "--prune")
+                        git("-C", targetDir, "ls-remote", "origin", "-q", stdout=subprocess.DEVNULL)
                     except subprocess.CalledProcessError:
                         pass  # fall through to failure response below
                     else:
-                        logger.info("fetch succeeded, removing credentials from origin URL")
+                        logger.info("ls-remote succeeded, removing credentials from origin URL")
                         git("-C", targetDir, "remote", "set-url", "origin", repoUrlOrig)
                         self.set_status(204)
                         return self.finish()
-                logger.info("fetch failed (expected in the pre-dialog check in the needCredentials case), see output above")
+                logger.info("ls-remote failed (expected in the pre-dialog check in the needCredentials case), see output above")
                 raise tornado.web.HTTPError(400, reason="Failed to update, maybe due to bad credentials") from None
+            logger.info("git ls-remote succeeded")
             self.set_status(204)
             return self.finish()
         targetDir = str(targetDir)
