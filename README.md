@@ -1,6 +1,6 @@
 # jupyterlab_ensure_clone
 
-[![Github Actions Status](https://github.com/ctcjab/jupyterlab-ensure-clone/workflows/Build/badge.svg)](https://github.com/ctcjab/jupyterlab-ensure-clone/actions/workflows/build.yml)
+[![Github Actions Status](https://github.com/chicagotrading/jupyterlab-ensure-clone/workflows/Build/badge.svg)](https://github.com/chicagotrading/jupyterlab-ensure-clone/actions/workflows/build.yml)
 
 Ensure a git repo has been cloned at startup.
 
